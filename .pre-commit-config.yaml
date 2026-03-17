@@ -1,0 +1,82 @@
+# Pre-commit hooks 配置
+# 安装: pip install pre-commit
+# 启用: pre-commit install
+# 运行: pre-commit run --all-files
+
+repos:
+  # 基础代码质量检查
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace        # 移除行尾空格
+      - id: end-of-file-fixer          # 确保文件以换行符结尾
+      - id: check-yaml                 # 检查 YAML 文件语法
+      - id: check-toml                 # 检查 TOML 文件语法
+      - id: check-added-large-files    # 阻止大文件提交
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict       # 检查合并冲突标记
+      - id: debug-statements           # 检查 debug 语句
+      - id: check-json                 # 检查 JSON 文件语法
+      - id: check-case-conflict        # 检查文件名大小写冲突
+      - id: mixed-line-ending          # 检查混合换行符
+        args: ['--fix=lf']
+
+  # Python 代码格式化 - Black
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3.8
+        args: ['--line-length=100']
+
+  # Python 代码检查 - Ruff（替代 flake8 + isort）
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.9
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+  # 类型检查 - MyPy（可选，比较慢）
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.8.0
+  #   hooks:
+  #     - id: mypy
+  #       additional_dependencies: [types-requests]
+  #       args: [--ignore-missing-imports, --no-strict-optional]
+  #       exclude: ^(tests/|examples/)
+
+  # 安全检查 - Bandit
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml']
+        additional_dependencies: ['bandit[toml]']
+        exclude: ^tests/
+
+  # 文档字符串检查（可选）
+  # - repo: https://github.com/pycqa/pydocstyle
+  #   rev: 6.3.0
+  #   hooks:
+  #     - id: pydocstyle
+  #       exclude: ^(tests/|examples/)
+
+# 全局配置
+default_language_version:
+  python: python3.8
+
+# 排除文件
+exclude: |
+  (?x)^(
+      \.venv/.*|
+      venv/.*|
+      build/.*|
+      dist/.*|
+      \.eggs/.*|
+      .*\.egg-info/.*|
+      \.git/.*|
+      \.mypy_cache/.*|
+      \.pytest_cache/.*|
+      \.ruff_cache/.*|
+      __pycache__/.*
+  )$

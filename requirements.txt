@@ -1,0 +1,12 @@
+# HTTP 客户端和重试机制
+requests>=2.28.0
+urllib3>=1.26.0,<2.0.0  # requests 的依赖，提供 urllib3.util.retry.Retry，限制 <2.0 以兼容 LibreSSL
+
+# 数据验证
+pydantic>=2.0.0
+
+# 环境变量管理
+python-dotenv>=0.20.0
+
+# 类型提示扩展
+typing-extensions>=4.0.0

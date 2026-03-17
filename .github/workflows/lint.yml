@@ -1,0 +1,46 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  lint:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run Black
+        run: |
+          black --check docflow tests examples
+
+      - name: Run Ruff
+        run: |
+          ruff check docflow tests examples
+
+      - name: Run MyPy
+        run: |
+          mypy docflow
+        continue-on-error: true  # 类型检查暂时不阻止 CI
+
+      - name: Check package
+        run: |
+          pip install build twine
+          python -m build
+          twine check dist/*
