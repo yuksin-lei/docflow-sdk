@@ -836,12 +836,6 @@ SDK 提供以下异常类型：
 
 MIT License
 
-## 📞 支持
-
-- 文档：[https://docs.example.com](https://docs.example.com)
-- Issues：[https://github.com/example/docflow-sdk/issues](https://github.com/example/docflow-sdk/issues)
-- Email：support@example.com
-
 ---
 
 **版本**: 1.0.0
