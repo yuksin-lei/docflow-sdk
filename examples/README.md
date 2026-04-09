@@ -46,7 +46,7 @@ DOCFLOW_APP_ID=your-app-id
 DOCFLOW_SECRET_CODE=your-secret-code
 DOCFLOW_BASE_URL=https://docflow.textin.com/api
 ```
-加载`.env` 配置：
+创建client时在代码中加载`.env` 配置：
 
 ```python
 from dotenv import load_dotenv

@@ -11,7 +11,15 @@ DocFlow SDK 快速开始 - 费用报销场景
 - 支付记录（图片）
 
 运行前准备：
-1. 设置环境变量：
+1. 设置配置（两种方式任选其一）：
+
+   方式一：使用 .env 文件（推荐）
+   在项目根目录或当前目录创建 .env 文件：
+   DOCFLOW_APP_ID=your-app-id
+   DOCFLOW_SECRET_CODE=your-secret-code
+   DOCFLOW_BASE_URL=https://docflow.textin.com/api
+
+   方式二：设置环境变量
    export DOCFLOW_APP_ID="your-app-id"
    export DOCFLOW_SECRET_CODE="your-secret-code"
    export DOCFLOW_BASE_URL="https://docflow.textin.com/api"
@@ -29,6 +37,7 @@ DocFlow SDK 快速开始 - 费用报销场景
 import os
 import time
 from datetime import datetime
+from pathlib import Path
 from docflow import DocflowClient, ExtractModel
 
 
@@ -49,7 +58,32 @@ def main():
 
     print_section("DocFlow SDK 快速开始 - 费用报销场景")
 
-    # 初始化客户端（从环境变量自动加载配置）
+    # 检查并加载配置
+    # 优先从 .env 文件加载,否则使用环境变量
+    env_file_locations = [
+        Path.cwd() / '.env',  # 当前工作目录
+        Path(__file__).parent / '.env',  # 脚本所在目录
+        Path(__file__).parent.parent / '.env',  # 项目根目录
+    ]
+
+    env_file_loaded = False
+    for env_path in env_file_locations:
+        if env_path.exists():
+            try:
+                from dotenv import load_dotenv
+                load_dotenv(env_path)
+                print(f"✓ 从 .env 文件加载配置: {env_path}")
+                env_file_loaded = True
+                break
+            except ImportError:
+                print("⚠ 未安装 python-dotenv,将从环境变量加载配置")
+                print("  提示: pip install python-dotenv")
+                break
+
+    if not env_file_loaded and not any(env_path.exists() for env_path in env_file_locations):
+        print("✓ 未找到 .env 文件,从环境变量加载配置")
+
+    # 初始化客户端（从环境变量加载配置）
     client = DocflowClient.from_env()
 
     # 样本文件目录
@@ -555,7 +589,7 @@ def main():
 
     print("后续操作：")
     print(f"1. 访问 DocFlow Web 页面查看详细结果")
-    print(f"   https://docflow.textin.com/api")
+    print(f"   https://docflow.textin.com")
     print(f"2. 工作空间ID: {workspace_id}")
     print(f"3. 规则库ID: {repo_id}")
     print(f"4. 审核任务ID: {review_task_id}")

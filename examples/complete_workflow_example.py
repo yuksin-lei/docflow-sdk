@@ -7,14 +7,54 @@
 3. 文件上传和处理
 4. 审核规则配置
 5. 审核执行和结果处理
+
+运行前准备:
+1. 设置配置(两种方式任选其一):
+
+   方式一: 使用 .env 文件(推荐)
+   在项目根目录或当前目录创建 .env 文件:
+   DOCFLOW_APP_ID=your-app-id
+   DOCFLOW_SECRET_CODE=your-secret-code
+   DOCFLOW_BASE_URL=https://docflow.textin.com/api
+
+   方式二: 设置环境变量
+   export DOCFLOW_APP_ID="your-app-id"
+   export DOCFLOW_SECRET_CODE="your-secret-code"
+   export DOCFLOW_BASE_URL="https://docflow.textin.com/api"
 """
 from docflow import DocflowClient, ExtractModel, AuthScope, FieldType, MismatchAction
 from datetime import datetime
+from pathlib import Path
 import time
 
 
 def setup_client():
     """初始化客户端"""
+    # 检查并加载配置
+    # 优先从 .env 文件加载,否则使用环境变量
+    env_file_locations = [
+        Path.cwd() / '.env',  # 当前工作目录
+        Path(__file__).parent / '.env',  # 脚本所在目录
+        Path(__file__).parent.parent / '.env',  # 项目根目录
+    ]
+
+    env_file_loaded = False
+    for env_path in env_file_locations:
+        if env_path.exists():
+            try:
+                from dotenv import load_dotenv
+                load_dotenv(env_path)
+                print(f"✓ 从 .env 文件加载配置: {env_path}")
+                env_file_loaded = True
+                break
+            except ImportError:
+                print("⚠ 未安装 python-dotenv,将从环境变量加载配置")
+                print("  提示: pip install python-dotenv")
+                break
+
+    if not env_file_loaded and not any(env_path.exists() for env_path in env_file_locations):
+        print("✓ 未找到 .env 文件,从环境变量加载配置")
+
     return DocflowClient.from_env()
 
 
@@ -639,7 +679,15 @@ def scenario_3_using_chaining():
 
 if __name__ == "__main__":
     """
-    运行示例前,请设置环境变量:
+    运行示例前,请设置配置(两种方式任选其一):
+
+    方式一: 使用 .env 文件(推荐)
+    在项目根目录或当前目录创建 .env 文件:
+    DOCFLOW_APP_ID=your-app-id
+    DOCFLOW_SECRET_CODE=your-secret-code
+    DOCFLOW_BASE_URL=https://docflow.textin.com/api
+
+    方式二: 设置环境变量
     export DOCFLOW_APP_ID="your-app-id"
     export DOCFLOW_SECRET_CODE="your-secret-code"
     export DOCFLOW_BASE_URL="https://docflow.textin.com/api"

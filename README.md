@@ -595,7 +595,7 @@ DOCFLOW_APP_ID=your-app-id
 DOCFLOW_SECRET_CODE=your-secret-code
 ```
 
-在代码中加载：
+创建client时在代码中加载`.env` 配置：
 
 ```python
 from dotenv import load_dotenv
