@@ -21,7 +21,7 @@
    export DOCFLOW_SECRET_CODE="your-secret-code"
    export DOCFLOW_BASE_URL="https://docflow.textin.com/api"
 """
-from docflow import DocflowClient
+from docflow import DocflowClient, ReviewModel
 from typing import List
 from pathlib import Path
 
@@ -342,7 +342,8 @@ def example_submit_task():
         workspace_id="123",
         name="2026年4月发票审核",
         repo_id="456",
-        extract_task_ids=["1234567890", "1234567891", "1234567892"]
+        extract_task_ids=["1234567890", "1234567891", "1234567892"],
+        model=ReviewModel.DEEPSEEK_R1
     )
 
     print(f"审核任务提交成功!")

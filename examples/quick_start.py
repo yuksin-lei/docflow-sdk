@@ -38,7 +38,7 @@ import os
 import time
 from datetime import datetime
 from pathlib import Path
-from docflow import DocflowClient, ExtractModel
+from docflow import DocflowClient, ExtractModel, ReviewModel
 
 
 def print_section(title):
@@ -104,11 +104,11 @@ def main():
     # ========== 步骤2: 配置文件类别 ==========
     print_step(2, "配置文件类别")
 
-    # 2.1 创建"报销申请单"类别
+    # 2.1 创建"REIMBURSEMENT_APPLICATION"类别
     print("  [2.1] 创建报销申请单类别...")
     baoxiao_category = client.category.create(
         workspace_id=workspace_id,
-        name="报销申请单",
+        name="REIMBURSEMENT_APPLICATION",
         extract_model=ExtractModel.Model_1,
         sample_files=[os.path.join(sample_dir, "报销申请单.XLS")],
         fields=[
@@ -138,11 +138,11 @@ def main():
     baoxiao_field_map = {field.name: field.id for field in baoxiao_fields.fields}
     print(f"    ✓ 获取了 {len(baoxiao_field_map)} 个字段ID")
 
-    # 2.2 创建"酒店水单"类别（含表格字段）
+    # 2.2 创建"HOTEL_RECEIPT"类别（含表格字段）
     print("  [2.2] 创建酒店水单类别...")
     hotel_category = client.category.create(
         workspace_id=workspace_id,
-        name="酒店水单",
+        name="HOTEL_RECEIPT",
         extract_model=ExtractModel.Model_1,
         sample_files=[os.path.join(sample_dir, "sample_hotel_receipt.png")],
         fields=[
@@ -189,11 +189,11 @@ def main():
                 hotel_table_field_map[field.name] = field.id
     print(f"    ✓ 获取了 {len(hotel_field_map)} 个普通字段ID, {len(hotel_table_field_map)} 个表格字段ID")
 
-    # 2.3 创建"支付记录"类别
+    # 2.3 创建"PAYMENT_RECORD"类别
     print("  [2.3] 创建支付记录类别...")
     payment_category = client.category.create(
         workspace_id=workspace_id,
-        name="支付记录",
+        name="PAYMENT_RECORD",
         extract_model=ExtractModel.Model_1,
         sample_files=[os.path.join(sample_dir, "sample_payment_record.png")],
         fields=[
@@ -235,9 +235,9 @@ def main():
     print_step(3, "上传待处理文件")
 
     files_to_upload = [
-        ("报销申请单.XLS", "报销申请单"),
-        ("sample_hotel_receipt.png", "酒店水单"),
-        ("sample_payment_record.png", "支付记录")
+        ("报销申请单.XLS", "REIMBURSEMENT_APPLICATION"),
+        ("sample_hotel_receipt.png", "HOTEL_RECEIPT"),
+        ("sample_payment_record.png", "PAYMENT_RECORD")
     ]
 
     batch_numbers = []
@@ -339,7 +339,7 @@ def main():
         referenced_fields=[
             {
                 "category_id": baoxiao_id,
-                "category_name": "报销申请单",
+                "category_name": "REIMBURSEMENT_APPLICATION",
                 "fields": [
                     {"field_id": baoxiao_field_map["申请人"], "field_name": "申请人"},
                     {"field_id": baoxiao_field_map["费用发生日期"], "field_name": "费用发生日期"},
@@ -364,7 +364,7 @@ def main():
         referenced_fields=[
             {
                 "category_id": baoxiao_id,
-                "category_name": "报销申请单",
+                "category_name": "REIMBURSEMENT_APPLICATION",
                 "fields": [
                     {"field_id": baoxiao_field_map["申请付款金额"], "field_name": "申请付款金额"}
                 ],
@@ -394,7 +394,7 @@ def main():
         referenced_fields=[
             {
                 "category_id": hotel_id,
-                "category_name": "酒店水单",
+                "category_name": "HOTEL_RECEIPT",
                 "fields": [
                     {"field_id": hotel_field_map["总金额"], "field_name": "总金额"}
                 ],
@@ -432,7 +432,7 @@ def main():
         referenced_fields=[
             {
                 "category_id": baoxiao_id,
-                "category_name": "报销申请单",
+                "category_name": "REIMBURSEMENT_APPLICATION",
                 "fields": [
                     {"field_id": baoxiao_field_map["差旅费金额"], "field_name": "差旅费金额"}
                 ],
@@ -440,7 +440,7 @@ def main():
             },
             {
                 "category_id": hotel_id,
-                "category_name": "酒店水单",
+                "category_name": "HOTEL_RECEIPT",
                 "fields": [
                     {"field_id": hotel_field_map["总金额"], "field_name": "总金额"}
                 ],
@@ -448,7 +448,7 @@ def main():
             },
             {
                 "category_id": payment_id,
-                "category_name": "支付记录",
+                "category_name": "PAYMENT_RECORD",
                 "fields": [
                     {"field_id": payment_field_map["交易金额"], "field_name": "交易金额"}
                 ],
@@ -470,7 +470,7 @@ def main():
         referenced_fields=[
             {
                 "category_id": baoxiao_id,
-                "category_name": "报销申请单",
+                "category_name": "REIMBURSEMENT_APPLICATION",
                 "fields": [
                     {"field_id": baoxiao_field_map["申请人"], "field_name": "申请人"}
                 ],
@@ -478,7 +478,7 @@ def main():
             },
             {
                 "category_id": payment_id,
-                "category_name": "支付记录",
+                "category_name": "PAYMENT_RECORD",
                 "fields": [
                     {"field_id": payment_field_map["付款方户名"], "field_name": "付款方户名"}
                 ],
@@ -507,7 +507,8 @@ def main():
         workspace_id=workspace_id,
         name=f"费用报销审核_{datetime.now().strftime('%H%M%S')}",
         repo_id=repo_id,
-        extract_task_ids=extract_task_ids
+        extract_task_ids=extract_task_ids,
+        model=ReviewModel.DEEPSEEK_R1
     )
     review_task_id = review_task['task_id']
     print(f"  ✓ 审核任务提交成功: {review_task_id}")
